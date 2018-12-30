@@ -16,6 +16,7 @@ Cartographer is a linux kernel module that is able to modify and hide linux memo
 	* CONFIG_KALLSYMS
 	* CONFIG_DYNAMIC_FTRACE_WITH_REGS
 	* CONFIG_HAVE_FENTRY
+	
 Your distro provider probably put a list of your config options in `/boot/config*`, there's a good chance your kernel already has these options, but if it does not, you'll have to rebuild from source.
 * Kernel headers for your current kernel.
 * elfutils development package ( "elfutils-libelf-devel" for redhat, "libelf-dev" for ubuntu )
@@ -86,4 +87,4 @@ After:
 
 -Alexey Lozovsky - For his series of articles [part1](https://www.apriorit.com/dev-blog/544-hooking-linux-functions-1) about ftrace and hooking with ftrace along with code snippets that I used in this project.
 
-[Heep](https://github.com/greenbytesoftware) for the Idea of changing maps this way.
+-[Heep](https://github.com/greenbytesoftware) for the Idea of changing maps this way.
