@@ -28,6 +28,7 @@ Your distro provider probably put a list of your config options in `/boot/config
 You can see all the output Cartographer makes in the kernel log with `dmesg --follow` or if you don't have dmesg, `tail -f` the appropriate log in /var/log
 
 After you have built Cartographer, you will need to load it. Since it is a kernel module, it has to be done by root.
+
 `sudo insmod cartographer.ko`
 
 Cartographer is very verbose and should tell you in the logs if something went wrong.
@@ -64,8 +65,11 @@ To unload the module, use `rmmod cartographer` ( as root still ). All features w
 ## Example
 I'll show you an example of removeentry.
 First set the target library( this is just some random one I picked )
+
 `echo "settarget libgio-2.0.so.0.5800.2" > /proc/cartographer`
+
 Then enable the feature
+
 `echo "removeentry" > /proc/cartographer`
 
 Before:
