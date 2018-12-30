@@ -84,6 +84,6 @@ After:
 
 ## Credits
 
--Alexey Lozovsky - For his article about ftrace and hooking with ftrace ( https://www.apriorit.com/dev-blog/544-hooking-linux-functions-1 ) along with code snippets that I used in this project.
+-Alexey Lozovsky - For his series of articles [part1](https://www.apriorit.com/dev-blog/544-hooking-linux-functions-1) about ftrace and hooking with ftrace along with code snippets that I used in this project.
 
--Heep ( github.com/greenbytesoftware ) for the Idea of changing maps this way.
+[Heep](https://github.com/greenbytesoftware) for the Idea of changing maps this way.
