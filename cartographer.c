@@ -165,11 +165,11 @@ static ssize_t on_write(struct file *file, const char *buf, size_t len, loff_t *
             printk( "settarget requires an argument! ( the target lib )\n");
             goto end;
         }
-        if( strlen(word) >= 63 ){
+        if( strlen(word) >= 64 ){
             printk( "target_lib max size is 64! make your name smaller or edit the source\n" );
             goto end;
         }
-        strncpy( settings.target_lib, word, 62 );
+        strncpy( settings.target_lib, word, sizeof(char) * 63 );
         printk( "target_lib set to: %s\n", settings.target_lib );
     } else if( strstr(word, "setspoofperms") ){
         word = strsep( &backup, " ,\n\t" );
@@ -231,6 +231,11 @@ static ssize_t on_write(struct file *file, const char *buf, size_t len, loff_t *
             settings.remove_entry = false;
         } else if( strstr( word, "spoofpermissions" ) ){
             printk("turning off spoofpermissions.\n");
+            settings.spoof_permissions = false;
+        } else if( strstr( word, "allsettings" ) ){
+            printk("turning off all settings.\n");
+            settings.null_file = false;
+            settings.remove_entry = false;
             settings.spoof_permissions = false;
         }
     } else {
