@@ -21,9 +21,14 @@ Your distro provider probably put a list of your config options in `/boot/config
 * Kernel headers for your current kernel.
 * elfutils development package ( "elfutils-libelf-devel" for redhat, "libelf-dev" for ubuntu )
 * Development Essentials ( make, gcc, etc. )
+
 ## Build Instructions
 *  After installing kernel headers, you should just be able to use the makefile.
 * `make` in the cartographer directory.
+
+## AUR Installation
+* You can install Cartographer by using the AUR helper of your choice and the package [cartographer-git](https://aur.archlinux.org/packages/cartographer-git/)
+* Load the module by using `sudo modprobe cartographer`
 
 ## How to Use
 You can see all the output Cartographer makes in the kernel log with `dmesg --follow` or if you don't have dmesg, `tail -f` the appropriate log in /var/log
@@ -88,3 +93,5 @@ After:
 -Alexey Lozovsky - For his series of articles [part1](https://www.apriorit.com/dev-blog/544-hooking-linux-functions-1) about ftrace and hooking with ftrace along with code snippets that I used in this project.
 
 -[Heep](https://github.com/greenbytesoftware) for the Idea of changing maps this way.
+
+-[telans](https://github.com/telans) for the AUR package.
