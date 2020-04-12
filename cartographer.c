@@ -257,8 +257,8 @@ static struct proc_ops file_ops = {
 };
 #else
 static struct file_operations file_ops = {
-    .owner = THIS_MODULE;
-    .write = on_write;
+    .owner = THIS_MODULE,
+    .write = on_write,
 };
 #endif
 
