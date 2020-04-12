@@ -9,6 +9,7 @@
 #include <linux/string.h>
 #include <linux/mutex.h>
 #include <asm/uaccess.h> //copy_from_user
+#include <linux/version.h>
 
 MODULE_DESCRIPTION("");
 MODULE_AUTHOR("");
@@ -89,6 +90,10 @@ static asmlinkage void (*orig_show_map_vma)(struct seq_file *m,
 static asmlinkage void cart_show_map_vma(struct seq_file *m,
                                          struct vm_area_struct *vma)
 {
+
+    struct file *file_backup;
+    unsigned long backup_flags;
+
     if( !vma || !vma->vm_file ) {
         return orig_show_map_vma( m, vma );
     }
@@ -98,8 +103,8 @@ static asmlinkage void cart_show_map_vma(struct seq_file *m,
         return orig_show_map_vma( m, vma );
     }
 
-    struct file *file_backup = vma->vm_file;
-    unsigned long backup_flags = vma->vm_flags;
+    file_backup = vma->vm_file;
+    backup_flags = vma->vm_flags;
 
     if( settings.remove_entry ){ // in some cases the memory offset makes this kinda obvious, but it seems there's gaps naturally too sometimes.
         cart_print("show_map_vma Hook - removing entry in maps (%s)\n", vma->vm_file->f_path.dentry->d_iname);
@@ -130,6 +135,7 @@ static ssize_t on_write(struct file *file, const char *buf, size_t len, loff_t *
 {
     u8 res; //perms
     int err;
+    char *backup, *word;
 
     /* not sure if this mutex is needed. */
     mutex_lock(&data_mutex);
@@ -139,7 +145,7 @@ static ssize_t on_write(struct file *file, const char *buf, size_t len, loff_t *
         goto end;
     }
     /* strsep changes the string, buf is constant, need to copy */
-    char *backup = kmalloc(len, GFP_KERNEL);
+    backup = kmalloc(len, GFP_KERNEL);
     if( !backup ){
         cart_print("Failed to malloc %ld bytes for argument parsing!\n", len);
         goto end;
@@ -151,7 +157,7 @@ static ssize_t on_write(struct file *file, const char *buf, size_t len, loff_t *
     }
     backup[len - 1] = '\0';
     /* Get First word for command */
-    char *word = strsep( &backup, " ,\n\t" );
+    word = strsep( &backup, " ,\n\t" );
     if( strstr(word, "settarget") ){
         word = strsep( &backup, " ,\n\t" );
         if( !word ){
@@ -245,7 +251,16 @@ end:
 }
 
 static struct ftrace_hook show_map_vma_hook;
-static struct file_operations file_ops;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static struct proc_ops file_ops = {
+    .proc_write = on_write,
+};
+#else
+static struct file_operations file_ops = {
+    .owner = THIS_MODULE,
+    .write = on_write,
+};
+#endif
 
 /* Search for a symbol in kallsyms. Some contain version specific suffixes */
 static int on_each_symbol(void *data, const char *name,
@@ -261,6 +276,8 @@ static int on_each_symbol(void *data, const char *name,
 }
 static int cart_startup(void)
 {
+   int ret;
+   struct proc_dir_entry *entry;
 
     if( !kallsyms_on_each_symbol( on_each_symbol, "show_map_vma" ) ){
         cart_print( "Error iterating through modules!\n" );
@@ -273,7 +290,7 @@ static int cart_startup(void)
     //show_map_vma_hook.name = "show_map_vma";
     show_map_vma_hook.function = cart_show_map_vma;
     show_map_vma_hook.original = &orig_show_map_vma;
-    int ret = init_hook( &show_map_vma_hook );
+    ret = init_hook( &show_map_vma_hook );
 
     if( ret )
         return ret;
@@ -296,7 +313,7 @@ static int cart_startup(void)
         return ret;
     }
 
-    struct proc_dir_entry *entry = proc_create(PROC_FILENAME, 0, NULL, &file_ops);
+    entry = proc_create(PROC_FILENAME, 0, NULL, &file_ops);
     if( !entry ){
         cart_print("proc_create failed! is NULL\nUnload and try again!\n");
         return -EUCLEAN;
@@ -308,9 +325,6 @@ static int cart_startup(void)
         cart_print("Failed to allocate Memory for libname(init)\n");
         return -ENOMEM;
     }
-
-    file_ops.owner = THIS_MODULE;
-    file_ops.write = on_write;
 
     cart_print("Cartographer Loading complete.\n");
     return 0;
