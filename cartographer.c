@@ -9,6 +9,7 @@
 #include <linux/string.h>
 #include <linux/mutex.h>
 #include <asm/uaccess.h> //copy_from_user
+#include <linux/version.h>
 
 MODULE_DESCRIPTION("");
 MODULE_AUTHOR("");
@@ -245,7 +246,16 @@ end:
 }
 
 static struct ftrace_hook show_map_vma_hook;
-static struct file_operations file_ops;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static struct proc_ops file_ops = {
+    .proc_write = on_write,
+};
+#else
+static struct file_operations file_ops = {
+    .owner = THIS_MODULE;
+    .write = on_write;
+};
+#endif
 
 /* Search for a symbol in kallsyms. Some contain version specific suffixes */
 static int on_each_symbol(void *data, const char *name,
@@ -308,9 +318,6 @@ static int cart_startup(void)
         cart_print("Failed to allocate Memory for libname(init)\n");
         return -ENOMEM;
     }
-
-    file_ops.owner = THIS_MODULE;
-    file_ops.write = on_write;
 
     cart_print("Cartographer Loading complete.\n");
     return 0;
