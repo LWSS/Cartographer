@@ -7,15 +7,20 @@
 ## What is it
 Cartographer is a linux kernel module that is able to modify and hide linux memory maps from userspace.
 
+## Update for Kernel >= 5.7
+Kernel 5.7 stops the export of kallsyms functions and has forced us to change the way we get symbol addresses. 
+
+The new method by [heep](https://github.com/h33p/kallsyms-lp) requires Kernel 5.0 or higher and uses the livepatcher feature.
 
 ## System Requirements
 * 64bit Linux system
-* Kernel Version >= 3.19( for FTRACE_OPS_FL_IPMODIFY )
+* Kernel Version >= 5.00( for Kernel Livepatch )
 * The following Kernel Build configurations 
 	* CONFIG_FTRACE
 	* CONFIG_KALLSYMS
 	* CONFIG_DYNAMIC_FTRACE_WITH_REGS
 	* CONFIG_HAVE_FENTRY
+	* CONFIG_LIVEPATCH
 	
 Your distro provider probably put a list of your config options in `/boot/config*`, there's a good chance your kernel already has these options, but if it does not, you'll have to rebuild from source.
 * Kernel headers for your current kernel.
@@ -28,14 +33,14 @@ Your distro provider probably put a list of your config options in `/boot/config
 
 ## AUR Installation
 * You can install Cartographer by using the AUR helper of your choice and the package [cartographer-git](https://aur.archlinux.org/packages/cartographer-git/)
-* Load the module by using `sudo modprobe cartographer`
+* Load the module by using `sudo modprobe cartographer_module`
 
 ## How to Use
 You can see all the output Cartographer makes in the kernel log with `dmesg --follow` or if you don't have dmesg, `tail -f` the appropriate log in /var/log
 
 After you have built Cartographer, you will need to load it. Since it is a kernel module, it has to be done by root.
 
-`sudo insmod cartographer.ko`
+`sudo insmod cartographer_module.ko`
 
 Cartographer is very verbose and should tell you in the logs if something went wrong.
 
@@ -92,6 +97,6 @@ After:
 
 -Alexey Lozovsky - For his series of articles [part1](https://www.apriorit.com/dev-blog/544-hooking-linux-functions-1) about ftrace and hooking with ftrace along with code snippets that I used in this project.
 
--[Heep](https://github.com/greenbytesoftware) for the Idea of changing maps this way.
+-[Heep](https://github.com/greenbytesoftware) for the Idea of changing maps this way, and for the new livepatch symbol resolving method.
 
 -[telans](https://github.com/telans) for the AUR package.

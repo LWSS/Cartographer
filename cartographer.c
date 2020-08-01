@@ -11,9 +11,12 @@
 #include <asm/uaccess.h> //copy_from_user
 #include <linux/version.h>
 
+#include "kallsyms.h"
+
 MODULE_DESCRIPTION("");
 MODULE_AUTHOR("");
 MODULE_LICENSE("GPL");
+MODULE_INFO(livepatch, "Y");
 
 #define cart_print(fmt, ...) printk( (KBUILD_MODNAME ": "fmt), ##__VA_ARGS__ );
 
@@ -262,29 +265,19 @@ static struct file_operations file_ops = {
 };
 #endif
 
-/* Search for a symbol in kallsyms. Some contain version specific suffixes */
-static int on_each_symbol(void *data, const char *name,
-                                      struct module *module, unsigned long address)
-{
-    if( strstr( name, "show_map_vma" ) != NULL ){
-        show_map_vma_hook.name = name;
-        show_map_vma_hook.address = address;
-        return 1; // non-zero stops iteration.
-    }
-
-    return 0;
-}
 static int cart_startup(void)
 {
-   int ret;
-   struct proc_dir_entry *entry;
+    int ret;
+    struct proc_dir_entry *entry;
 
-    if( !kallsyms_on_each_symbol( on_each_symbol, "show_map_vma" ) ){
-        cart_print( "Error iterating through modules!\n" );
+    if( init_kallsyms() ){
+        cart_print( "Error initing kallsyms hack.\n" );
         return -EAGAIN;
     }
+    show_map_vma_hook.name = "show_map_vma";
+    show_map_vma_hook.address = kallsyms_lookup_name( "show_map_vma" );
     if( !show_map_vma_hook.address ){
-        cart_print( "Error resolving the Address\n" );
+        cart_print( "Error resolving the show_map_vma Address\n" );
         return -ENXIO;
     }
     //show_map_vma_hook.name = "show_map_vma";

@@ -7,3 +7,4 @@ Module.symvers
 modules.order
 .idea/
 cmake-build-debug/
+*.mod
