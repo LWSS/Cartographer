@@ -32,7 +32,7 @@ Your distro provider probably put a list of your config options in `/boot/config
 * `make` in the cartographer directory.
 
 ## AUR Installation
-* You can install Cartographer by using the AUR helper of your choice and the package [cartographer-dkms-git](cartographer-dkms-git)
+* You can install Cartographer by using the AUR helper of your choice and the package [cartographer-dkms-git](https://aur.archlinux.org/packages/cartographer-dkms-git/)
 * Load the module by using `sudo modprobe cartographer_module`
 
 ## How to Use
