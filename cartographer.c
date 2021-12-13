@@ -16,7 +16,8 @@
 MODULE_DESCRIPTION("");
 MODULE_AUTHOR("");
 MODULE_LICENSE("GPL");
-MODULE_INFO(livepatch, "Y");
+MODULE_INFO(CONFIG_KPROBES, "N");
+MODULE_INFO(CONFIG_LIVEPATCH, "Y");
 
 #define cart_print(fmt, ...) printk( (KBUILD_MODNAME ": "fmt), ##__VA_ARGS__ );
 
@@ -75,8 +76,9 @@ static int init_hook( struct ftrace_hook *hook )
 }
 
 static void notrace ftrace_thunk(unsigned long ip, unsigned long parent_ip,
-                                    struct ftrace_ops *ops, struct pt_regs *regs)
+                                    struct ftrace_ops *ops, struct ftrace_regs *fregs)
 {
+    struct pt_regs *regs = ftrace_get_regs(fregs);
     struct ftrace_hook *hook = container_of(ops, struct ftrace_hook, ops);
 
 #if USE_FENTRY_OFFSET
@@ -290,7 +292,7 @@ static int cart_startup(void)
 
     show_map_vma_hook.ops.func = ftrace_thunk;
     show_map_vma_hook.ops.flags = FTRACE_OPS_FL_SAVE_REGS
-                                  | FTRACE_OPS_FL_RECURSION_SAFE
+                                  | FTRACE_OPS_FL_RECURSION
                                   | FTRACE_OPS_FL_IPMODIFY;
 
     ret = ftrace_set_filter_ip(&show_map_vma_hook.ops, show_map_vma_hook.address, 0, 0);

@@ -1,27 +1,27 @@
-<p align="center">  
-<img src="https://i.imgur.com/kaY6nqc.jpg">  
+<p align="center">
+<img src="https://i.imgur.com/kaY6nqc.jpg">
 </p>
 
-# The Cartographer 
+# The Cartographer
 
 ## What is it
 Cartographer is a linux kernel module that is able to modify and hide linux memory maps from userspace.
 
 ## Update for Kernel >= 5.7
-Kernel 5.7 stops the export of kallsyms functions and has forced us to change the way we get symbol addresses. 
+Kernel 5.7 stops the export of kallsyms functions and has forced us to change the way we get symbol addresses.
 
-The new method by [heep](https://github.com/h33p/kallsyms-lp) requires Kernel 5.0 or higher and uses the livepatcher feature.
+The new method by [heep](https://github.com/h33p/kallsyms-lp) requires Kernel 5.0 or higher and uses either the livepatcher or the kprobe feature based on the module info set in cartographer.c
 
 ## System Requirements
 * 64bit Linux system
 * Kernel Version >= 5.00( for Kernel Livepatch )
-* The following Kernel Build configurations 
+* The following Kernel Build configurations
 	* CONFIG_FTRACE
 	* CONFIG_KALLSYMS
 	* CONFIG_DYNAMIC_FTRACE_WITH_REGS
 	* CONFIG_HAVE_FENTRY
 	* CONFIG_LIVEPATCH
-	
+
 Your distro provider probably put a list of your config options in `/boot/config*`, there's a good chance your kernel already has these options, but if it does not, you'll have to rebuild from source.
 * Kernel headers for your current kernel.
 * elfutils development package ( "elfutils-libelf-devel" for redhat, "libelf-dev" for ubuntu )
@@ -32,7 +32,7 @@ Your distro provider probably put a list of your config options in `/boot/config
 * `make` in the cartographer directory.
 
 ## AUR Installation
-* You can install Cartographer by using the AUR helper of your choice and the package [cartographer-git](https://aur.archlinux.org/packages/cartographer-git/)
+* You can install Cartographer by using the AUR helper of your choice and the package [cartographer-dkms-git](https://aur.archlinux.org/packages/cartographer-dkms-git/)
 * Load the module by using `sudo modprobe cartographer_module`
 
 ## How to Use
@@ -50,7 +50,7 @@ When the module is loaded, it creates a file in /proc/ (`/proc/cartographer`) th
 
 *Note: Only the root user is allowed to send input to Cartographer.*
 
-Commands are sent to Cartogarpher like this 
+Commands are sent to Cartogarpher like this
 `[root@localhost]# echo "$COMMAND ..." > /proc/cartographer`
 
 The following commands are recognized by the program.
@@ -84,13 +84,13 @@ Then enable the feature
 `echo "removeentry" > /proc/cartographer`
 
 Before:
-<p align="center">  
-<img src="https://i.imgur.com/fISekdt.png">  
+<p align="center">
+<img src="https://i.imgur.com/fISekdt.png">
 </p>
 
 After:
-<p align="center">  
-<img src="https://i.imgur.com/Mr2Pak1.png">  
+<p align="center">
+<img src="https://i.imgur.com/Mr2Pak1.png">
 </p>
 
 ## Credits
@@ -99,4 +99,4 @@ After:
 
 -[Heep](https://github.com/greenbytesoftware) for the Idea of changing maps this way, and for the new livepatch symbol resolving method.
 
--[telans](https://github.com/telans) for the AUR package.
+-[aw1cks](https://github.com/aw1cks) for the new AUR package.
